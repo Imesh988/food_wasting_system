@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExpirySmsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,5 +17,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/sms', [ExpirySmsController::class, 'index'])->name('sms.form');
+Route::post('/sms/send', [ExpirySmsController::class, 'send'])->name('sms.send');
 
 require __DIR__.'/auth.php';

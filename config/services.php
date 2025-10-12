@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'textlk' => [
+    'base' => env('TEXTLK_API_BASE','https://app.text.lk/api/v3'),
+    'key' => env('TEXTLK_API_KEY'),
+    'sender_id' => env('TEXTLK_SENDER_ID','TextLKDemo'),
+],
+
 ];
