@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/sms', [ExpirySmsController::class, 'index'])->name('sms.form');
+Route::get('/sms{id', [ExpirySmsController::class, 'index'])->name('sms.form');
 Route::post('/sms/send', [ExpirySmsController::class, 'send'])->name('sms.send');
 
 Route::view('/scan', 'scan');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Services\TextLkService;
 use Illuminate\Http\Request;
 
@@ -21,7 +22,6 @@ class ExpirySmsController extends Controller
         return view('sms_form');
     }
 
-    // SMS යැවීම
     public function send(Request $request)
     {
         $validated = $request->validate([
@@ -49,5 +49,14 @@ class ExpirySmsController extends Controller
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
+
+        
     }
+    public function showSmsForm($id){
+            $item = Item::findOrFail($id);
+            $message = " Item with barcode {$item->barcode} ";
+
+            return view('sms_form', compact('item' ,'message'));
+            
+        }
 }

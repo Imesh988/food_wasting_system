@@ -27,7 +27,9 @@
                 </div>
                 <div class="mb-3">
                     <label for="message" class="form-label">Message</label>
-                    <textarea name="message" id="message" rows="3" class="form-control" required>Test message from Food Wasting System</textarea>
+                    <textarea name="message" id="message" rows="3" class="form-control" required>
+                        {{ $message ?? 'Test message form food wasting syetm ' }}
+                    </textarea>
                 </div>
                 <button type="submit" class="btn btn-success w-100">Send SMS</button>
             </form>
