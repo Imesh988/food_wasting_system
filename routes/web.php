@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\ExpirySmsController;
+use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,5 +25,10 @@ Route::post('/sms/send', [ExpirySmsController::class, 'send'])->name('sms.send')
 
 Route::view('/scan', 'scan');
 Route::post('/scan-barcode', [BarcodeController::class,'scan'])->name('scan.barcode');
+
+
+Route::resource('food',FoodController::class);
+
+
 
 require __DIR__.'/auth.php';

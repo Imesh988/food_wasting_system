@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Food extends Model
 {
     //
-    protected $fillable = ['name','user_id','owner_phone','expiry_date','quantity','notes'];
+     public $incrementing = false;
 
-    protected $casts = [
-        'expiry_date' => 'date',
-    ];
+    protected $keyType = 'string';
+
+    protected $table = 'food';
+    use HasFactory;
+    protected $fillable = ['name','owner_phone','expiry_date','quantity','notes'];
+
+   
 }
