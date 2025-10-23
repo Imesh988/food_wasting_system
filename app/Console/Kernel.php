@@ -9,7 +9,7 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('sms:send-expiry 2')->dailyAt('08:00');
+        $schedule->command('food:check-expiry')->dailyAt('22:28');
     }
 
     protected function commands(): void

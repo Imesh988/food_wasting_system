@@ -4,6 +4,8 @@ use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\ExpirySmsController;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\ProfileController;
+use App\Mail\ExpiryNotification;
+use App\Models\Food;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,7 +30,11 @@ Route::post('/scan-barcode', [BarcodeController::class,'scan'])->name('scan.barc
 
 
 Route::resource('food',FoodController::class);
-
+Route::get('/test-email', function () {
+    $foods = Food::all();
+    Mail::to('imeshramanayaka988@gmail.com')->send(new ExpiryNotification($foods));
+    return 'Test email sent!';
+});
 
 
 require __DIR__.'/auth.php';
