@@ -6,7 +6,7 @@
        
         <div class="card-body">
             <div class="p-2 col-4">
-                <input class="form-control" name="name" type="text"
+                <input class="form-control " name="name" type="text"
                 value="{{old('name',$food->name ?? "")}}" placeholder="Enter food name">
             </div>
             <div class="p-2">

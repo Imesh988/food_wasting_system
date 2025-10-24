@@ -31,15 +31,15 @@ class CheckFoodExpiry extends Command
     {
         //
         $today = Carbon::today()->toDateString();
-        $expiredFood = Food::where('expiry_date', $today)->get();
+        $expiredFood = Food::where('expiry_date','<=', $today)->get();
 
-        if($expiredFood->count() > 0){
+        if($expiredFood->isNotEmpty()){
             Mail::to('imeshramanayaka988@gmail.com')->send(new ExpiryNotification($expiredFood));
-            $this->info('Expire notification send !');
+            $this->info('Expire notification send !' . $expiredFood->count() . 'food item !!');
         }else{
             $this->info('not food today expire !!');
         }
-            $this->info('Scheduler ran at ' . now());
+            $this->info('⏱ Scheduler ran at' . now());
 
     }
 }
