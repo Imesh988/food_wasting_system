@@ -7,6 +7,7 @@ use App\Models\Food;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class CheckFoodExpiry extends Command
 {
@@ -22,24 +23,31 @@ class CheckFoodExpiry extends Command
      *
      * @var string
      */
-    protected $description = 'Check food expiry and send email';
+    protected $description = 'Check food expiry and send email to super admin';
 
     /**
      * Execute the console command.
      */
     public function handle()
-    {
-        //
-        $today = Carbon::today()->toDateString();
-        $expiredFood = Food::where('expiry_date','<=', $today)->get();
+{
+    $today = Carbon::today()->toDateString();
 
-        if($expiredFood->isNotEmpty()){
-            Mail::to('imeshramanayaka988@gmail.com')->send(new ExpiryNotification($expiredFood));
-            $this->info('Expire notification send !' . $expiredFood->count() . 'food item !!');
-        }else{
-            $this->info('not food today expire !!');
-        }
-            $this->info('⏱ Scheduler ran at' . now());
+    // Only foods expiring today
+    $todayExpiredFoods = Food::whereDate('expiry_date', $today)->get();
 
+    if ($todayExpiredFoods->isNotEmpty()) {
+        \Mail::to('imeshramanayaka988@gmail.com')
+             ->send(new ExpiryNotification($todayExpiredFoods));
+
+        $this->info('✅ Expire notification sent for ' . $todayExpiredFoods->count() . ' food items.');
+        \Log::info('Expire notification sent for ' . $todayExpiredFoods->count() . ' food items.');
+    } else {
+        $this->info('🎉 No food expired today.');
+        \Log::info('No food expired today.');
     }
+
+    $this->info('⏱ Scheduler ran at ' . now());
+    \Log::info('Scheduler ran at ' . now());
+}
+
 }
