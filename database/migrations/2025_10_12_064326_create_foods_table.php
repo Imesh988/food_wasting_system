@@ -13,10 +13,14 @@ return new class extends Migration {
         Schema::create('food', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('owner_phone')->nullable(); // store phone to send SMS
+            $table->string('owner_phone')->nullable(); 
             $table->date('expiry_date');
             $table->integer('quantity')->default(1);
             $table->text('notes')->nullable();
+
+            
+            $table->timestamp('sms_sent_on_qty_reached')->nullable();
+
             $table->timestamps();
         });
     }
@@ -26,6 +30,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('food');
+        Schema::dropIfExists('food'); 
     }
 };

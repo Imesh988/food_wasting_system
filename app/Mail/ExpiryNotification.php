@@ -11,25 +11,23 @@ class ExpiryNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $foodItems; // Collection of expired foods
+   public $todayExpiredFoods;
+public $next3DaysFoods;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct(Collection $foodItems)
-    {
-        $this->foodItems = $foodItems;
-    }
+public function __construct($todayExpiredFoods, $next3DaysFoods)
+{
+    $this->todayExpiredFoods = $todayExpiredFoods;
+    $this->next3DaysFoods = $next3DaysFoods;
+}
 
-    /**
-     * Build the message.
-     */
-    public function build()
-    {
-        return $this->subject('Food Expiry Notification')
-                    ->view('emails.expiry_notification') 
-                    ->with([
-                        'foodItems' => $this->foodItems,
-                    ]);
-    }
+public function build()
+{
+    return $this->subject('Food Expiry Notification')
+                ->view('emails.expiry_notification')
+                ->with([
+                    'todayExpiredFoods' => $this->todayExpiredFoods,
+                    'next3DaysFoods'   => $this->next3DaysFoods,
+                ]);
+}
+
 }

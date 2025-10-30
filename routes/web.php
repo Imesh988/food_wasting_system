@@ -27,15 +27,16 @@ Route::get('/sms{id', [ExpirySmsController::class, 'index'])->name('sms.form');
 Route::post('/sms/send', [ExpirySmsController::class, 'send'])->name('sms.send');
 
 Route::view('/scan', 'scan');
-Route::post('/scan-barcode', [BarcodeController::class,'scan'])->name('scan.barcode');
+Route::post('/scan-barcode', [BarcodeController::class, 'scan'])->name('scan.barcode');
 
 
-Route::resource('food',FoodController::class);
+Route::resource('food', FoodController::class);
 Route::get('/test-email', function () {
     $foods = Food::all();
     Mail::to('imeshramanayaka988@gmail.com')->send(new ExpiryNotification($foods));
     return 'Test email sent!';
 });
 
+Route::post('/send-expiry-notifications', [ProfileController::class, 'sendExpiryNotifications'])->name('send.expiry.notifications');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

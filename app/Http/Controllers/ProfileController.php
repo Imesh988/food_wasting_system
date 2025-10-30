@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Console\Commands\CheckFoodExpiry;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Mail\ExpiryNotification;
 use App\Models\Food;
@@ -10,20 +9,16 @@ use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Log;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-
-    public function index(Request $request){
-
-        $this->checkExpiry();
-
-    }
     public function edit(Request $request): View
     {
         return view('profile.edit', [
@@ -68,26 +63,47 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-        public function checkExpiry()
+    /**
+     * Send expiry notifications manually (AJAX compatible)
+     */
+   public function sendExpiryNotifications(Request $request)
 {
-    $today = Carbon::today()->toDateString();
+    try {
+        $today = Carbon::today();
+        $threeDaysLater = $today->copy()->addDays(3);
 
-    // Only foods expiring today
-    $todayExpiredFoods = Food::whereDate('expiry_date', $today)->get();
+        $todayExpiredFoods = Food::whereDate('expiry_date', $today)->get();
+        $next3DaysFoods = Food::whereDate('expiry_date', '>', $today)
+                               ->whereDate('expiry_date', '<=', $threeDaysLater)
+                               ->get();
 
-    if ($todayExpiredFoods->isNotEmpty()) {
-        \Mail::to('imeshramanayaka988@gmail.com')
-             ->send(new ExpiryNotification($todayExpiredFoods));
+        if ($todayExpiredFoods->isNotEmpty() || $next3DaysFoods->isNotEmpty()) {
+            Mail::to('imeshramanayaka988@gmail.com')
+                ->send(new ExpiryNotification($todayExpiredFoods, $next3DaysFoods));
 
-        echo('✅ Expire notification sent for ' . $todayExpiredFoods->count() . ' food items.');
-        \Log::info('Expire notification sent for ' . $todayExpiredFoods->count() . ' food items.');
-    } else {
-        echo('🎉 No food expired today.');
-        \Log::info('No food expired today.');
+            $message = '✅ Expire notification sent: '
+                . $todayExpiredFoods->count() . ' today, '
+                . $next3DaysFoods->count() . ' in next 3 days.';
+
+            Log::info($message);
+        } else {
+            $message = '🎉 No food expiring today or in next 3 days.';
+            Log::info($message);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $message
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Error sending expiry notifications: ' . $e->getMessage());
+
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
     }
-
-    echo('⏱ Scheduler ran at ' . now());
-    \Log::info('Scheduler ran at ' . now());
 }
 
 }

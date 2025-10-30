@@ -11,43 +11,38 @@ use Illuminate\Support\Facades\Log;
 
 class CheckFoodExpiry extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'food:check-expiry';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Check food expiry and send email to super admin';
 
-    /**
-     * Execute the console command.
-     */
     public function handle()
-{
-    $today = Carbon::today()->toDateString();
+    {
+        $today = Carbon::today();
+        $threeDaysLater = $today->copy()->addDays(3);
 
-    // Only foods expiring today
-    $todayExpiredFoods = Food::whereDate('expiry_date', $today)->get();
+        // Foods expiring today
+        $todayExpiredFoods = Food::whereDate('expiry_date', $today)->get();
 
-    if ($todayExpiredFoods->isNotEmpty()) {
-        \Mail::to('imeshramanayaka988@gmail.com')
-             ->send(new ExpiryNotification($todayExpiredFoods));
+        // Foods expiring in next 3 days (excluding today)
+        $next3DaysFoods = Food::whereDate('expiry_date', '>', $today)
+                               ->whereDate('expiry_date', '<=', $threeDaysLater)
+                               ->get();
 
-        $this->info('✅ Expire notification sent for ' . $todayExpiredFoods->count() . ' food items.');
-        \Log::info('Expire notification sent for ' . $todayExpiredFoods->count() . ' food items.');
-    } else {
-        $this->info('🎉 No food expired today.');
-        \Log::info('No food expired today.');
+        if ($todayExpiredFoods->isNotEmpty() || $next3DaysFoods->isNotEmpty()) {
+            Mail::to('imeshramanayaka988@gmail.com')
+                ->send(new ExpiryNotification($todayExpiredFoods, $next3DaysFoods));
+
+            $this->info('✅ Expire notification sent: '
+                . $todayExpiredFoods->count() . ' today, '
+                . $next3DaysFoods->count() . ' in next 3 days.');
+            Log::info('Expire notification sent: '
+                . $todayExpiredFoods->count() . ' today, '
+                . $next3DaysFoods->count() . ' in next 3 days.');
+        } else {
+            $this->info('🎉 No food expiring today or in next 3 days.');
+            Log::info('No food expiring today or in next 3 days.');
+        }
+
+        $this->info('⏱ Scheduler ran at ' . now());
+        Log::info('Scheduler ran at ' . now());
     }
-
-    $this->info('⏱ Scheduler ran at ' . now());
-    \Log::info('Scheduler ran at ' . now());
-}
-
 }
